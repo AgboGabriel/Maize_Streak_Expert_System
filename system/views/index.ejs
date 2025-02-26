@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Diagnosis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+   <style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: url('https://media.gettyimages.com/id/1400367539/photo/fresh-corn-cob.jpg?s=612x612&w=0&k=20&c=JDGDX_bTtoYnXDwd0oU6C8n6Axt7arIjpY9t8Yqb0_k=') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+.form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 450px;
+    width: 100%;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #4CAF50;
+    box-shadow: 0px 5px 12px rgba(76, 175, 80, 0.3);
+    outline: none;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.btn {
+    flex: 1;
+    background: #4CAF50;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 0 5px;
+}
+
+.btn:hover {
+    background: #45a049;
+    box-shadow: 0px 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.solution-container {
+    display: none;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.solution-container h3 {
+    color: #4CAF50;
+}
+   </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Maize Streak Diagnosis</h2>
+        <form id="multiStepForm" action="/solution" method="POST">
+            
+            <!-- Step 1: Symptoms -->
+            <div class="form-step active" id="step1">
+                <h3>Step 1: Symptoms</h3>
+                <div class="form-group">
+                    <label for="symptom_name">Symptom Name</label>
+                    <input type="text" id="symptom_name" name="symptom_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confidence_level">Choose the intensity</label>
+                    <select name="confidence_level" id="confidence_level" required>
+                        <option value=""></option>
+                        <option value="0.2">Low</option>
+                        <option value="0.5">Medium</option>
+                        <option value="0.9">High</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Farm Conditions -->
+            <div class="form-step" id="step4">
+                <h3>Farm Conditions (Relevant to the Symptoms)</h3>
+                <div class="form-group">
+                    <label for="condition_name">Condition Name</label>
+                    <input type="text" id="condition_name" name="condition_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confidence_deduction">Choose intensity</label>
+                    <select name="confidence_level_for_farm_conditions" id="confidence_level_for_farm_conditions" required>
+                        <option value=""></option>
+                        <option value="0.2">Low</option>
+                        <option value="0.5">Medium</option>
+                        <option value="0.9">High</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn" onclick="prevStep()">Back</button>
+                    <button type="button" class="btn" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Description -->
+            <div class="form-step" id="step2">
+                <h3>Step 2: Description</h3>
+                <div class="form-group">
+                    <label for="solution_description">Optional Description</label>
+                    <textarea id="solution_description" name="solution_description"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn" onclick="prevStep()">Back</button>
+                    <button type="submit" class="btn">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const steps = document.querySelectorAll(".form-step");
+
+        function showStep(step) {
+            steps.forEach((s, index) => {
+                s.classList.toggle("active", index === step);
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+    </script>
+</body>
+</html>
