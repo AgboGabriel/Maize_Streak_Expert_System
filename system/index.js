@@ -4,19 +4,33 @@ import bodyParser from "body-parser";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
+import env from "dotenv";
 
 const app = express();
-const port = 3000;
+const port = process.env.Port||3000
+env.config();
+// const db= new pg.Client({
+//     user:"postgres",
+//     host:"localhost",
+//     password:"@chim0t@",
+//     database:"Expert_System",
+//     port: 5000,
+//   })
+//   db.connect();
 
-const db= new pg.Client({
-    user:"postgres",
-    host:"localhost",
-    password:"@chim0t@",
-    database:"Expert_System",
-    port: 5000,
-  })
-  db.connect();
-
+const { Pool } = pg;
+const pool = new Pool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: 5432, // PostgreSQL default port
+    ssl: {
+      rejectUnauthorized: false,  // Allow self-signed SSL certificates
+    }
+  });
+  pool.connect()
+  
 app.use(bodyParser.urlencoded({extended:true}));
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -40,7 +54,7 @@ app.post('/solution', async (req, res) => {
 
     try {
         // Step 1: Retrieve matching symptom and its confidence level from the database
-        const symptomResult = await db.query(
+        const symptomResult = await pool.query(
             "SELECT symptom_id, symptom_name, confidence_level FROM Symptoms WHERE LOWER(symptom_name) LIKE '%' || $1 || '%';",
             [symptom_name.toLowerCase()]
         );

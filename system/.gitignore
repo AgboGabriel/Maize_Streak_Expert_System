@@ -1,1 +1,8 @@
 node_modules
+.env
+
+
+postgresql://expert_system_db_user:7M6w3ioBdFzwLTu14qZILipRRGiCLxzM@dpg-
+cuvolhtumphs739oj680-a.oregon-postgres.render.com
+/
+expert_system_db
